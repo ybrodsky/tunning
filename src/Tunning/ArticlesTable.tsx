@@ -8,9 +8,8 @@ import {
 } from "@mui/material";
 import { sumBy } from "lodash";
 import { NumberFld } from "./NumberFld";
+import { NumDisplay } from "./NumDisplay";
 import { OrderArticle, TunningGroup } from "./types";
-
-const round = (v: number) => Math.round(v * 100) / 100;
 
 type Props = {
   propKey: "source" | "processor";
@@ -50,11 +49,17 @@ export const OrderArticleTable = ({ propKey, group, index }: Props) => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Quality</TableCell>
-            <TableCell>Weight (t)</TableCell>
-            <TableCell>Bale count</TableCell>
-            <TableCell>Unit price</TableCell>
-            <TableCell>Price per quality</TableCell>
+            <TableCell width={130}>Quality</TableCell>
+            <TableCell width={100} align="right">
+              Weight (t)
+            </TableCell>
+            <TableCell width={100} align="right">
+              Bale count
+            </TableCell>
+            <TableCell width={130} align="right">
+              Unit price
+            </TableCell>
+            <TableCell align="right">Price per quality</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -64,15 +69,22 @@ export const OrderArticleTable = ({ propKey, group, index }: Props) => {
             return (
               <TableRow key={articleIndex}>
                 <TableCell>{orderArticle.Article.name_en}</TableCell>
-                <TableCell>{round(weight)}</TableCell>
-                <TableCell>
+                <TableCell align="right">
+                  {<NumDisplay value={weight} />} t
+                </TableCell>
+                <TableCell align="right">
                   <NumberFld
                     name={`groups.${index}.articles.${articleIndex}.${amountKey}`}
                   />
                 </TableCell>
-                <TableCell>{orderArticle[priceKey]} €</TableCell>
-                <TableCell>
-                  {round(weight * orderArticle[priceKey])} €
+                <TableCell align="right">{orderArticle[priceKey]} €</TableCell>
+                <TableCell align="right">
+                  {
+                    <NumDisplay
+                      value={weight * orderArticle[priceKey]}
+                      currency
+                    />
+                  }
                 </TableCell>
               </TableRow>
             );
@@ -83,25 +95,28 @@ export const OrderArticleTable = ({ propKey, group, index }: Props) => {
               style={{
                 color: totalWeight !== totalOpositeWeight ? "red" : "inherit",
               }}
+              align="right"
             >
-              {totalWeight}
+              <NumDisplay value={totalWeight} /> t
             </TableCell>
             <TableCell
+              align="right"
               style={{
                 color: totalBales !== totalOpositeBales ? "red" : "inherit",
               }}
             >
-              {totalBales}
+              <NumDisplay value={totalBales} />
             </TableCell>
-            <TableCell>&nbsp;</TableCell>
-            <TableCell>
-              {round(
-                sumBy(
+            <TableCell align="right">&nbsp;</TableCell>
+            <TableCell align="right">
+              <NumDisplay
+                value={sumBy(
                   group.articles,
                   (oa) => calculateWeight(oa) * oa[priceKey]
-                )
-              )}{" "}
-              € &nbsp;&nbsp;
+                )}
+                currency
+              />
+              &nbsp;&nbsp;
               <small style={{ color: "green" }}>
                 ({propKey === "source" ? 1 : 2})
               </small>

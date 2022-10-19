@@ -9,8 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { TunningGroup } from "./types";
-
-const round = (v: number) => Math.round(v * 100) / 100;
+import { NumDisplay } from "./NumDisplay";
 
 type Props = {
   group: TunningGroup;
@@ -26,7 +25,7 @@ export const Totals = ({ group }: Props) => {
     ? group.bales.total_weight / group.bales.bale_count || 0
     : 0;
 
-  const total = round(
+  const total =
     articles.reduce((acc, oa) => {
       const source =
         weightPerBale * parseFloat(oa.source_amount || 0) * oa.source_price;
@@ -36,17 +35,14 @@ export const Totals = ({ group }: Props) => {
         oa.processor_price;
 
       return acc + (processor - source);
-    }, 0) - cost
-  );
-  const totalSource = round(
-    articles.reduce(
-      (acc, oa) =>
-        acc + weightPerBale * parseFloat(oa.source_amount) * oa.source_price,
-      0
-    )
+    }, 0) - cost;
+  const totalSource = articles.reduce(
+    (acc, oa) =>
+      acc + weightPerBale * parseFloat(oa.source_amount) * oa.source_price,
+    0
   );
 
-  const originalTotal = round(
+  const originalTotal =
     originalArticles.reduce((acc, oa) => {
       const source =
         weightPerBale * parseFloat(oa.source_amount || 0) * oa.source_price;
@@ -56,29 +52,20 @@ export const Totals = ({ group }: Props) => {
         oa.processor_price;
 
       return acc + (processor - source);
-    }, 0) - cost
-  );
+    }, 0) - cost;
 
-  const originalTotalSource = round(
-    originalArticles.reduce(
-      (acc, oa) =>
-        acc + weightPerBale * parseFloat(oa.source_amount) * oa.source_price,
-      0
-    )
+  const originalTotalSource = originalArticles.reduce(
+    (acc, oa) =>
+      acc + weightPerBale * parseFloat(oa.source_amount) * oa.source_price,
+    0
   );
 
   const totalDifference = total - originalTotal;
 
   const perTonneDifference =
-    round(total / bales.total_weight) -
-    round(originalTotal / bales.total_weight);
+    total / bales.total_weight - originalTotal / bales.total_weight;
   const buyingDifference =
-    round(totalSource / bales.total_weight) -
-    round(originalTotalSource / bales.total_weight);
-
-  const getColor = (v: number) => {
-    return v > 0 ? "green" : v < 0 ? "red" : "initial";
-  };
+    totalSource / bales.total_weight - originalTotalSource / bales.total_weight;
 
   return (
     <Box mt={4}>
@@ -86,58 +73,60 @@ export const Totals = ({ group }: Props) => {
         <TableHead>
           <TableRow>
             <TableCell>Value</TableCell>
-            <TableCell>Before</TableCell>
-            <TableCell>After</TableCell>
-            <TableCell>Added value</TableCell>
+            <TableCell align="right">Before</TableCell>
+            <TableCell align="right">After</TableCell>
+            <TableCell align="right">Added value</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           <TableRow>
             <TableCell>Total result</TableCell>
-            <TableCell>€ {originalTotal}</TableCell>
-            <TableCell>€ {total}</TableCell>
-            <TableCell>
-              <Typography
-                component="span"
-                style={{ color: getColor(totalDifference) }}
-              >
-                € {totalDifference}
-              </Typography>
+            <TableCell align="right">
+              <NumDisplay value={originalTotal} currency />
+            </TableCell>
+            <TableCell align="right">
+              <NumDisplay value={total} currency />
+            </TableCell>
+            <TableCell align="right">
+              <NumDisplay value={totalDifference} profit />
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Total per tonne</TableCell>
-            <TableCell>€ {round(originalTotal / bales.total_weight)}</TableCell>
-            <TableCell>€ {round(total / bales.total_weight)}</TableCell>
-            <TableCell>
-              <Typography
-                component="span"
-                style={{ color: getColor(perTonneDifference) }}
-              >
-                € {perTonneDifference}
-              </Typography>
+            <TableCell align="right">
+              <NumDisplay value={originalTotal / bales.total_weight} currency />
+            </TableCell>
+            <TableCell align="right">
+              <NumDisplay value={total / bales.total_weight} currency />
+            </TableCell>
+            <TableCell align="right">
+              <NumDisplay value={perTonneDifference} profit />
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Buying price per ton of cut</TableCell>
-            <TableCell>
-              € {round(originalTotalSource / bales.total_weight)}
+            <TableCell align="right">
+              <NumDisplay
+                value={originalTotalSource / bales.total_weight}
+                currency
+              />
             </TableCell>
-            <TableCell>€ {round(totalSource / bales.total_weight)}</TableCell>
-            <TableCell>
-              <Typography
-                component="span"
-                style={{ color: getColor(buyingDifference) }}
-              >
-                € {buyingDifference}
-              </Typography>
+            <TableCell align="right">
+              <NumDisplay value={totalSource / bales.total_weight} currency />
+            </TableCell>
+            <TableCell align="right">
+              <NumDisplay value={buyingDifference} profit />
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Cost per ton</TableCell>
-            <TableCell>€ {round(cost / bales.total_weight)}</TableCell>
-            <TableCell>€ {round(cost / bales.total_weight)}</TableCell>
-            <TableCell>-</TableCell>
+            <TableCell align="right">
+              <NumDisplay value={cost / bales.total_weight} currency />
+            </TableCell>
+            <TableCell align="right">
+              <NumDisplay value={cost / bales.total_weight} currency />
+            </TableCell>
+            <TableCell align="right">-</TableCell>
           </TableRow>
         </TableBody>
       </Table>

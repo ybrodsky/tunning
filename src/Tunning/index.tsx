@@ -38,7 +38,7 @@ export const Tunning = ({ order }: Props) => {
   });
 
   return (
-    <Box>
+    <Box p={2}>
       <Formik
         initialValues={{
           groups,
